@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Bright Spot</title>
+    <style>
+        :root {
+            --gold: #FFC107;
+            --orange: #FF8F00;
+            --brown: #3E2723;
+            --stem: #2E7D32;
+            --leaf: #1B5E20;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Space-between keeps text at top and flower at bottom */
+            justify-content: space-between; 
+            height: 100dvh; 
+            margin: 0;
+            background: radial-gradient(circle at center, #fff4e6 0%, #ffc3a0 100%);
+            font-family: 'Palatino', 'Georgia', serif;
+            overflow: hidden;
+            padding: 40px 20px; /* Extra padding for top and bottom */
+            box-sizing: border-box;
+        }
+
+        #bloomBtn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 16px 32px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            background: white;
+            border: none;
+            border-radius: 50px;
+            color: var(--brown);
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            z-index: 200;
+            transition: opacity 0.5s;
+        }
+
+        .message {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--brown);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 1s ease 3.5s;
+            line-height: 1.5;
+            z-index: 150; /* Higher than flower */
+            margin-top: 20px;
+        }
+
+        .flower-stage {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 60vh; /* Controlled height to prevent overlap */
+            margin-bottom: -40px; /* Pulls it slightly closer to the bottom edge */
+        }
+
+        .stem {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 10px;
+            height: 0;
+            background: linear-gradient(to top, var(--leaf), var(--stem));
+            transform: translateX(-50%);
+            border-radius: 10px 10px 0 0;
+            transition: height 2.5s ease-in-out;
+        }
+
+        /* Adjusted leaves to be more proportional */
+        .leaf {
+            position: absolute;
+            width: 45px;
+            height: 25px;
+            background: var(--leaf);
+            border-radius: 50% 0 50% 0;
+            opacity: 0;
+            transition: opacity 1s 1.8s;
+        }
+        .leaf.left { bottom: 30%; left: -40px; transform: rotate(-30deg); }
+        .leaf.right { bottom: 50%; right: -40px; transform: rotate(110deg); }
+
+        .head-wrap {
+            position: absolute;
+            top: -55px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            width: 110px;
+            height: 110px;
+            transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2.2s;
+            animation: nodding 4s ease-in-out infinite;
+        }
+
+        .center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 55px;
+            height: 55px;
+            background: var(--brown);
+            background-image: radial-gradient(#5D4037 20%, transparent 25%);
+            background-size: 7px 7px;
+            border-radius: 50%;
+            z-index: 10;
+            border: 3px solid #2D1A17;
+        }
+
+        .petal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 28px;
+            height: 75px;
+            background: linear-gradient(to top, var(--orange), var(--gold));
+            border-radius: 50% 50% 20% 20%;
+            transform-origin: center bottom;
+        }
+
+        @keyframes nodding {
+            0%, 100% { transform: translateX(-50%) rotate(-2deg); }
+            50% { transform: translateX(-50%) rotate(2deg); }
+        }
+
+        .pollen {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="bloomBtn">Open your gift</button>
+
+    <div class="message" id="msg">
+        A sunflower symbolically,  represents loyalty and "looking on the bright side."
+    </div>
+
+    <div class="flower-stage" id="stage">
+        <div class="stem" id="stem">
+            <div class="leaf left"></div>
+            <div class="leaf right"></div>
+            <div class="head-wrap" id="head">
+                <div class="center"></div>
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.getElementById('bloomBtn');
+        const stage = document.getElementById('stage');
+        const stem = document.getElementById('stem');
+        const head = document.getElementById('head');
+        const msg = document.getElementById('msg');
+
+        // Create Petals
+        for (let i = 0; i < 18; i++) {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.style.transform = `translate(-50%, -100%) rotate(${i * 20}deg)`;
+            head.appendChild(petal);
+        }
+
+        btn.addEventListener('click', () => {
+            btn.style.opacity = '0';
+            setTimeout(() => btn.style.display = 'none', 500);
+            
+            stage.style.display = 'block';
+            
+            setTimeout(() => {
+                // Growth limited to 50% of viewport to prevent hitting the text
+                stem.style.height = '50vh'; 
+                document.querySelectorAll('.leaf').forEach(l => l.style.opacity = '1');
+                head.style.transform = 'translateX(-50%) scale(1)';
+                msg.style.opacity = '1';
+                msg.style.transform = 'translateY(0)';
+                createPollen();
+            }, 100);
+        });
+
+        function createPollen() {
+            for(let i=0; i<15; i++) {
+                let p = document.createElement('div');
+                p.className = 'pollen';
+                document.body.appendChild(p);
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                p.animate([
+                    { transform: 'translate(0,0)', opacity: 0 },
+                    { transform: 'translate(20px, -50px)', opacity: 0.6 },
+                    { transform: 'translate(40px, -100px)', opacity: 0 }
+                ], { duration: 3000 + Math.random()*3000, iterations: Infinity });
+            }
+        }
+    </script>
+</body>
+</html>
